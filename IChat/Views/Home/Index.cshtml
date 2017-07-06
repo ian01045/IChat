@@ -1,0 +1,16 @@
+﻿@model IEnumerable<IChat.Models.user_master>
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>聊天室首頁-測試遠端認可</h2>
+
+
+<div class="list-group col-lg-12 col-md-12 col-sm-6 col-sm-3">
+    @foreach(var user in Model)
+    {
+        <a href="@Url.Action("Index","Home")" class="list-group-item">@user.name</a>
+    }
+    @*<button type="button" class="list-group-item">Cras justo odio</button>*@
+
+</div>
