@@ -131,6 +131,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>IChatModel.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Models\IRepository.cs" />
+    <Compile Include="Models\Repository.cs" />
     <Compile Include="Models\user_master.cs">
       <DependentUpon>IChatModel.tt</DependentUpon>
     </Compile>
