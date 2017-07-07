@@ -35,6 +35,11 @@ namespace IChat.Models
         {
             dc.Entry(_entiy).State = EntityState.Modified;
             dc.SaveChanges();
+            //找出例外狀況詳細位置的方法，把ex加入監看式，找出錯誤點
+            //try { dc.SaveChanges(); }
+            //catch (Exception ex)
+            //{ throw; }
+            
         }
 
         public IEnumerable<T> GetAll()
