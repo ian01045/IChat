@@ -5,12 +5,32 @@
 
 <h2>聊天室首頁</h2>
 
-
-<div class="list-group col-lg-12 col-md-12 col-sm-6 col-sm-3">
-    @foreach(var user in Model)
-    {
-        <a href="@Url.Action("Index","Home")" class="list-group-item">@user.name</a>
-    }
-    @*<button type="button" class="list-group-item">Cras justo odio</button>*@
-
-</div>
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>會員姓名</th>
+            <th>會員名稱</th>
+            <th>會員電話</th>
+            <th>會員email</th>
+            <th>編輯</th>
+            <th>刪除</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.id</td>
+                <td>@user.name</td>
+                <td>@user.phone</td>
+                <td>@user.email</td>
+                <td>
+                    <a href="@Url.Action("Index","Home")" class="btn btn-primary"><span class="glyphicon glyphicon-pencil"></span></a>
+                </td>
+                <td>
+                    <a href="@Url.Action("Index","Home")" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
