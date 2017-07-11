@@ -13,6 +13,7 @@ namespace IChat.Controllers
         // GET: Account
         public ActionResult Index(user_master _user)
         {
+            if (_user.email == null && _user.password == null) return View();
             var user = dc.user_master.Where(u => u.email == _user.email && u.password == _user.password).FirstOrDefault();
             if (user != null)
             {
@@ -22,12 +23,12 @@ namespace IChat.Controllers
                 {
                     returnUrl = Request.QueryString["returnUrl"];
                 }
-                //return RedirectToAction("Index", "Home");
-                return Redirect(returnUrl);
+                return RedirectToAction("Index", "Home", new { id = user.id });
+                //return Redirect(returnUrl);
             }
             else
             {
-                ViewBag.message = "密碼錯誤請重新輸入!!";
+                ViewBag.message = "帳號密碼錯誤請重新輸入!!";
                 return View();
             }
             

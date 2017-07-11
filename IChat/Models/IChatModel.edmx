@@ -14,6 +14,7 @@
           <Property Name="name" Type="varchar" MaxLength="45" Nullable="false" />
           <Property Name="phone" Type="varchar" MaxLength="45" Nullable="false" />
           <Property Name="password" Type="varchar" MaxLength="15" />
+          <Property Name="IsOnline" Type="bit" />
         </EntityType>
         <EntityContainer Name="db_ichatModelStoreContainer">
           <EntitySet Name="user_master" EntityType="Self.user_master" Schema="db_ichat" store:Type="Tables" />
@@ -34,6 +35,7 @@
           <Property Name="name" Type="String" Nullable="false" MaxLength="45" FixedLength="false" Unicode="false" />
           <Property Name="phone" Type="String" Nullable="false" MaxLength="45" FixedLength="false" Unicode="false" />
           <Property Name="password" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="IsOnline" Type="Boolean" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -44,6 +46,7 @@
           <EntitySetMapping Name="user_master">
             <EntityTypeMapping TypeName="db_ichatModel.user_master">
               <MappingFragment StoreEntitySet="user_master">
+                <ScalarProperty Name="IsOnline" ColumnName="IsOnline" />
                 <ScalarProperty Name="password" ColumnName="password" />
                 <ScalarProperty Name="phone" ColumnName="phone" />
                 <ScalarProperty Name="name" ColumnName="name" />

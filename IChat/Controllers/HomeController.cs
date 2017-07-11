@@ -12,8 +12,9 @@ namespace IChat.Controllers
         // GET: Home
         db_ichatEntities dc = new db_ichatEntities();
         Repository<user_master> repository = new Repository<user_master>();
-        public ActionResult Index()
+        public ActionResult Index(int id)
         {
+            ViewBag.user = repository.GetById(id);
             return View(dc.user_master);
         }
 
