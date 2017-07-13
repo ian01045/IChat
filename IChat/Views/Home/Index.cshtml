@@ -171,10 +171,10 @@
         chat = $.connection.chatHub;
         // Create a function that the hub can call back to display messages.
         var id =@ViewBag.user.id;
-        chat.client.addMessage =function(name,message)
-        {
-            $('#discussion').append('<li><strong>' + htmlEncode(name)+ '</strong>: ' + htmlEncode(message) + '</li>');
-        };
+        //chat.client.addMessage =function(name,message)
+        //{
+        //    $('#discussion').append('<li><strong>' + htmlEncode(name)+ '</strong>: ' + htmlEncode(message) + '</li>');
+        //};
         var username ="@ViewBag.user.name";
         $('#displayname').val(username);
         // Set initial focus to message input box.
@@ -184,28 +184,27 @@
             alert(message);
         }
         //注册显示信息的方法
-        chat.client.addMessage = function (message, connectionId) {
-            var findbtn_conID="button[connectionId="+connectionId+"]";
-            var friendName= $(findbtn_conID).attr('friendName');
+        chat.client.addMessage = function (message, connectionId,ismyself) {
+
             debugger
             if ($.inArray(connectionId, clients)==-1) {
+                var findbtn_conID="button[connectionId="+connectionId+"]";
+                var friendName= $(findbtn_conID).attr('friendName');
                 showWin(connectionId,friendName);
             }
-            //userName
-            userName=@ViewBag.user.name;
-            if(friendName)
+            if(ismyself)
             {
-                $("#" + connectionId).find("ul").each(function () {
-                    $(this).append('<li>'+friendName+"  "+message+'</li>');
-                })
+                //$('#chat_area').append('<li>'+username+"  "+message+'</li>')
+                $("#" + connectionId).find("ul").append('<li>'+username+"  "+message+'</li>')
             }
             else
             {
-                $("#" + connectionId).find("ul").each(function () {
-                    $(this).append('<li>'+userName+"  "+message+'</li>');
-                })
+                var findbtn_conID="button[connectionId="+connectionId+"]";
+                var friendName= $(findbtn_conID).attr('friendName');
+                $("#" + connectionId).find("ul").append('<li>'+friendName+"  "+message+'</li>')
             }
-    
+
+           // $("#" + connectionId).find("ul").append($(this).append('<li>'+connectionId+"  "+message+'</li>'))
         }
         //注册显示所有用户的方法
         chat.client.getUsers = function (data) {
@@ -260,7 +259,7 @@
         {
             //var connectionId = $(obj).attr('connectionId');
             clients.push(connectionId);
-            var html = '<div style="float:left;margin-left:30px;border:double" id="' + connectionId + '" connectionId="' + connectionId + '">' + friendName + '的房间聊天记录如下:<button onclick="exitChat(this)">退出</button><ul></ul><input type="text" /> <button onclick="sendMessage(this)">发送</button></div>';
+            var html = '<div style="float:left;margin-left:30px;border:double" id="' + connectionId + '" connectionId="' + connectionId + '">' + friendName + '的房间聊天记录如下:<button onclick="exitChat(this)">退出</button><ul id=chat_area></ul><input type="text" /> <button onclick="sendMessage(this)">发送</button></div>';
             $("#userBox").append(html);
         }
 

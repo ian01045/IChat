@@ -44,9 +44,9 @@ namespace IChat.Hubs
             var user = users.Where(s => s.ConnectionID == connectionId).FirstOrDefault();
             if (user != null)
             {
-                Clients.Client(connectionId).addMessage(message + " " + DateTime.Now, Context.ConnectionId);
+                Clients.Client(connectionId).addMessage(message , Context.ConnectionId, false);
                 //给自己发送，把用户的ID传给自己  
-                Clients.Client(Context.ConnectionId).addMessage(message + " " + DateTime.Now, connectionId);
+                Clients.Client(Context.ConnectionId).addMessage(message, connectionId,true);
             }
             else
             {
