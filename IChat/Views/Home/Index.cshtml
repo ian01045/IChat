@@ -160,37 +160,130 @@
 
 
 @section js{
-
     <script src="~/Scripts/jquery.signalR-2.2.2.min.js"></script>
     <script src="~/signalr/hubs"></script>
     <script>
+    var clients = [];
+    var chat;
+    var userName;
     $(function () {
         // Reference the auto-generated proxy for the hub.
-        var chat = $.connection.chatHub;
+        chat = $.connection.chatHub;
         // Create a function that the hub can call back to display messages.
-        //chat.client.addNewMessageToPage = function (name, message)
-        //chat.client.addMessage = function (name, message)
         var id =@ViewBag.user.id;
-        chat.client.send =function(userId,message)
+        chat.client.addMessage =function(name,message)
         {
-            if(userId==id)
-            {
-              $('#discussion').append('<li><strong>' + htmlEncode(userId)+ '</strong>: ' + htmlEncode(message) + '</li>');
-            }
+            $('#discussion').append('<li><strong>' + htmlEncode(name)+ '</strong>: ' + htmlEncode(message) + '</li>');
         };
-        //$('#displayname').val(prompt('Enter your name:', ''));
+        var username ="@ViewBag.user.name";
+        $('#displayname').val(username);
         // Set initial focus to message input box.
         $('#message').focus();
-        // Start the connection.
+        //显示提示方法
+        chat.client.showMessage = function (message) {
+            alert(message);
+        }
+        //注册显示信息的方法
+        chat.client.addMessage = function (message, connectionId) {
+            var findbtn_conID="button[connectionId="+connectionId+"]";
+            var friendName= $(findbtn_conID).attr('friendName');
+            debugger
+            if ($.inArray(connectionId, clients)==-1) {
+                showWin(connectionId,friendName);
+            }
+            //userName
+            userName=@ViewBag.user.name;
+            if(friendName)
+            {
+                $("#" + connectionId).find("ul").each(function () {
+                    $(this).append('<li>'+friendName+"  "+message+'</li>');
+                })
+            }
+            else
+            {
+                $("#" + connectionId).find("ul").each(function () {
+                    $(this).append('<li>'+userName+"  "+message+'</li>');
+                })
+            }
+    
+        }
+        //注册显示所有用户的方法
+        chat.client.getUsers = function (data) {
+
+            if (data) {
+                var json = $.parseJSON(data);
+
+                console.info(json);
+                $("#users").html(" ");
+                for (var i = 0; i < json.length; i++) {
+                    var html = '<li>用户名:' + json[i].Name + '<button friendName="'+json[i].Name+'" connectionId="' + json[i].ConnectionID + '" onclick="userChat(this)">聊天</button>';
+                    $("#users").append(html);
+                }
+            }
+        }
+        //注册显示推出聊天提示的方法
+        chat.client.exitUser = function (data)
+        {
+            alert(data);
+        }
+        //注册显示个人信息的方法
+        chat.client.showId = function (data)
+        {
+            $("#conId").html(data);
+            clients.push(data);
+        }
+
         $.connection.hub.start().done(function () {
+
+            var connId = $.connection.hub.id;
+            $('#connId').text(connId);
+            chat.server.getName(username);
+
+
             $('#sendmessage').click(function () {
-                chat.server.send( 3,$('#message').val());
-                //chat.server.sendOne($('#displayname').val(), $('#message').val());
-                $('#discussion').append('<li><strong>' +id+ '</strong>: ' + $('#message').val() + '</li>');
-                $('#message').val('').focus();
+                var friendId = $('#friendconnId').val();
+                chat.server.sendClient($('#displayname').val(), $('#message').val(), friendId);
+                //$('#discussion').append('<li><strong>' +username+ '</strong>: ' + $('#message').val() + '</li>');
+                //$('#message').val('').focus();
             });
         });
     });
+
+        //开始聊天
+        function userChat(obj)
+        {
+            var connectionId = $(obj).attr('connectionId');
+            var friendName = $(obj).attr('friendName');
+            showWin(connectionId,friendName);
+        }
+        function  showWin(connectionId,friendName)
+        {
+            //var connectionId = $(obj).attr('connectionId');
+            clients.push(connectionId);
+            var html = '<div style="float:left;margin-left:30px;border:double" id="' + connectionId + '" connectionId="' + connectionId + '">' + friendName + '的房间聊天记录如下:<button onclick="exitChat(this)">退出</button><ul></ul><input type="text" /> <button onclick="sendMessage(this)">发送</button></div>';
+            $("#userBox").append(html);
+        }
+
+        function exitChat(btnObj)
+        {
+            debugger
+            //  var connectionId = $(btnObj).parent().attr("connectionId");
+            $(btnObj).parent().remove();
+            //chat.server.exitChat(connectionId);
+        }
+        //发送消息
+        function sendMessage(data)
+        {
+            var message = $(data).prev().val();
+            var  userObj = $(data).parent();
+            var username = $("#userName").html();
+            message = username + ":" + message;
+            console.info($(userObj).attr("connectionId"));
+            var targetConnectionId = $(userObj).attr("connectionId");
+            chat.server.sendMessage(targetConnectionId, message);
+            $(data).prev().val("");
+        }
+
     // This optional function html-encodes messages for display in the page.
     function htmlEncode(value) {
         var encodedValue = $('<div />').text(value).html();
@@ -198,35 +291,22 @@
     }
    </script>
 
-
-    @*<script>
-        $(function () {
-            // Declare a proxy to reference the hub.
-            var chat = $.connection.chatHub;
-            // Create a function that the hub can call to broadcast messages.
-            chat.client.addChatMessage = function (who, message) {
-                // Html encode display name and message.
-                var encodedName = $('<div />').text(who).html();
-                var encodedMsg = $('<div />').text(message).html();
-                // Add the message to the page.
-                $('#chat').append('<li><strong>' + encodedName
-                    + '</strong>:&nbsp;&nbsp;' + encodedMsg + '</li>');
-            };
-
-            // Start the connection.
-            $.connection.hub.start().done(function () {
-                $('#sendmessage').click(function () {
-                    // Call the Send method on the hub.
-                    chat.server.sendChatMessage($('#displayname').val(), $('#message').val());
-                    // Clear text box and reset focus for next comment.
-                    $('#message').val('').focus();
-                });
-            });
-        });
-    </script>*@
     }
 <h2>聊天室首頁</h2>
 <h3>@ViewBag.user.name 你好~</h3>
+<div>名称：<p id="userName"></p></div>
+<div>ConnectionID:<p id="conId"></p></div>  
+<div style="width:25%;border:1px solid #ff0000">
+    <div>在线用户列表</div>
+    <ul id="users"></ul>
+    <div id="userBox"></div> 
+</div>  
+<h3 id="connId"></h3>
+<input type="text" id="friendconnId" />
+<input type="text" id="message" />
+<input type="button" id="sendmessage" value="Send" />
+<input type="hidden" id="displayname" />
+<ul id="discussion"></ul>
 <div class="container">
     @*<a href="@Url.Action("Index","Home")" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span></a>*@
     <div class="row">
@@ -271,15 +351,6 @@
                 }
             }
         </div>
-
-
-        <div class="container">
-            <input type="text" id="message" />
-            <input type="button" id="sendmessage" value="Send" />
-            <input type="hidden" id="displayname" />
-            <ul id="discussion"></ul>
-        </div>
-
 
 
 
