@@ -5,12 +5,14 @@ using System.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
 using Newtonsoft.Json;
+using IChat.Models;
 
 
 namespace IChat.Hubs
 {
     public class ChatHub : Hub
     {
+        private db_ichatEntities dc = new db_ichatEntities();
         public class User
         {
             public string ConnectionID { get; set; }
@@ -44,15 +46,15 @@ namespace IChat.Hubs
             var user = users.Where(s => s.ConnectionID == connectionId).FirstOrDefault();
             if (user != null)
             {
-                Clients.Client(connectionId).addMessage(message , Context.ConnectionId, false);
+                Clients.Client(connectionId).addMessage(message, Context.ConnectionId, false);
                 //给自己发送，把用户的ID传给自己  
-                Clients.Client(Context.ConnectionId).addMessage(message, connectionId,true);
+                Clients.Client(Context.ConnectionId).addMessage(message, connectionId, true);
             }
             else
             {
                 Clients.Client(Context.ConnectionId).showMessage("该用户已离线");
             }
-        }  
+        }
 
 
         public void GetName(string name)
@@ -61,11 +63,18 @@ namespace IChat.Hubs
             var user = users.SingleOrDefault(u => u.ConnectionID == Context.ConnectionId);
             if (user != null)
             {
-                user.Name = name;
-                Clients.Client(Context.ConnectionId).showId(Context.ConnectionId);
+                //user.Name = name;
+                //Clients.Client(Context.ConnectionId).showId(Context.ConnectionId);
+                var user_db = dc.user_master.Where(u => u.name == name).FirstOrDefault();
+                if (user_db != null)
+                {
+                    user_db.IsOnline = true;
+                    user_db.ConnectionId = Context.ConnectionId;
+                }
+                dc.SaveChanges();
             }
             GetUsers();
-        }  
+        }
         /// <summary>  
         /// 重写连接事件  
         /// </summary>  
@@ -77,6 +86,7 @@ namespace IChat.Hubs
             //判断用户是否存在，否则添加集合  
             if (user == null)
             {
+
                 user = new User("", Context.ConnectionId);
                 users.Add(user);
             }
@@ -88,6 +98,12 @@ namespace IChat.Hubs
             //判断用户是否存在，存在则删除  
             if (user != null)
             {
+                //var user_db = dc.user_master.Where(u => u.id.ToString() == Context.ConnectionId).FirstOrDefault();
+                //if (user_db != null)
+                //{
+                //    user_db.IsOnline = false;
+                //}
+                //dc.SaveChanges();
                 //删除用户  
                 users.Remove(user);
             }
@@ -97,10 +113,13 @@ namespace IChat.Hubs
         //获取所有用户在线列表  
         private void GetUsers()
         {
-            var list = users.Select(s => new { s.Name, s.ConnectionID }).ToList();
-            string jsonList = JsonConvert.SerializeObject(list);
-            Clients.All.getUsers(jsonList);
-        }  
+            //var list = users.Select(s => new { s.Name, s.ConnectionID }).ToList();
+            //string jsonList = JsonConvert.SerializeObject(list);
+            //Clients.All.getUsers(jsonList);
+
+            var users = dc.user_master.ToList();
+            Clients.All.getUsers(users);
+        }
 
         //public string GetUserId(string userId)
         //{

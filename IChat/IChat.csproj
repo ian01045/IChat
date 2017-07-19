@@ -120,6 +120,7 @@
     <Content Include="Content\Site.css" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
+    <Content Include="Media\green_dot_2.png" />
     <Content Include="Models\IChatModel.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>IChatModel.edmx</DependentUpon>
