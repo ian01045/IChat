@@ -35,7 +35,7 @@ namespace IChat.Controllers
             repository.Create(_user);
 
             return RedirectToAction("Index");
-        
+
         }
 
         public ActionResult Delete(int id = 0) //這裡的"id"和RoutedConfig內對於路由'url: "{controller}/{action}/{id}"'的顯示管理用的"id"要一樣才能傳值，不然就是後面要接?idx=2用Get方法傳值
@@ -68,6 +68,12 @@ namespace IChat.Controllers
 
             //轉到Index Action顯示修改完的結果
             return RedirectToAction("Index");
+        }
+
+
+        public ActionResult ChatRoomTemplate()
+        {
+            return View();
         }
     }
 }
