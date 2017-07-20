@@ -98,12 +98,13 @@ namespace IChat.Hubs
             //判断用户是否存在，存在则删除  
             if (user != null)
             {
-                //var user_db = dc.user_master.Where(u => u.id.ToString() == Context.ConnectionId).FirstOrDefault();
-                //if (user_db != null)
-                //{
-                //    user_db.IsOnline = false;
-                //}
-                //dc.SaveChanges();
+                var user_db = dc.user_master.Where(u => u.ConnectionId == Context.ConnectionId).FirstOrDefault();
+                if (user_db != null)
+                {
+                    user_db.IsOnline = false;
+                    user_db.ConnectionId = "";
+                }
+                dc.SaveChanges();
                 //删除用户  
                 users.Remove(user);
             }

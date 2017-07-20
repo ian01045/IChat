@@ -68,7 +68,7 @@
                     {
                         //console.log(data[i])
                         if(data[i].name==username)continue;//如果是自己就跳過這輪迴圈
-                        var user= $("<a></a>").attr({"class":"list-group-item alert alert-success","id":data[i].id}).text(data[i].name);
+                        var user= $("<a></a>").attr({"class":"list-group-item alert alert-success","id":data[i].id,"connectionId":data[i].ConnectionId}).text(data[i].name);
                         user.append('<input type="button" value="私聊" class="btn btn-primary btn-sm pull-right chat_btn" />')
                         if(data[i].IsOnline==true)
                         {
@@ -144,8 +144,9 @@
             //var connectionId = $(obj).attr('connectionId');
             //var friendName = $(obj).attr('friendName');
             //showWin(connectionId,friendName);
-            $(this)
-
+            var connectionId=$(this).parent.attr('connectionId').val();
+            var friendName=$(this).parent.text();
+            showWin(connectionId,friendName);
         })
     </script>
 
