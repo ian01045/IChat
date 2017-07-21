@@ -140,12 +140,6 @@
         :-moz-placeholder { /* Firefox 18- */
             color: #d4d4d4;
         }
-        /*.chat_frame {
-            float: left;
-            width: 200px;
-            overflow-y: auto;
-            height: 600px;
-        }*/
     </style>
     }
 @section js{
@@ -201,17 +195,8 @@
                           '</li>';
                 $("ul").append(control);
             }
-            //setTimeout(
-            //    function(){                        
-            //        $("ul").append(control);
 
-            //    }, time);
-    
         }
-
-            //function resetChat(){
-            //    $("ul").empty();
-            //}
 
             $(".mytext").on("keyup", function(e){
                 if (e.which == 13){
@@ -223,16 +208,6 @@
                 }
             });
 
-            //-- Clear Chat
-            //resetChat();
-
-            //-- Print Messages
-            //insertChat("me", "Hello Tom...", 0);  
-            //insertChat("you", "Hi, Pablo", 1500);
-            //insertChat("me", "What would you like to talk about today?", 3500);
-            //insertChat("you", "Tell me a joke",7000);
-            //insertChat("me", "Spaceman: Computer! Computer! Do we bring battery?!", 9500);
-        //insertChat("you", "LOL", 12000);
             $(function () {
                     insertChat("me", "Hello Tom...");
                     insertChat("you", "Hi, Pablo");
@@ -241,12 +216,7 @@
                     insertChat("me", "Spaceman: Computer! Computer! Do we bring battery?!");
                     insertChat("you", "LOL");
             });
-            //window.onload = function () {
 
-            //}
-
-
-            //-- NOTE: No use time on insertChat.
     </script>
     }
 <h2>ChatRoomTemplate</h2>

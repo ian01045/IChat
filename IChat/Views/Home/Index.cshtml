@@ -6,9 +6,148 @@
 
 @section css{
     <style>
-        .vcenter {
+        /*.vcenter {
             display: inline-block;
             vertical-align: middle;
+        }*/
+    </style>
+
+    @*style for chat win*@
+    <style>
+        .mytext {
+            border: 0;
+            padding: 10px;
+            background: whitesmoke;
+        }
+
+        .text {
+            width: 75%;
+            display: flex;
+            flex-direction: column;
+        }
+
+            .text > p:first-of-type {
+                width: 100%;
+                margin-top: 0;
+                margin-bottom: auto;
+                line-height: 13px;
+                font-size: 12px;
+            }
+
+            .text > p:last-of-type {
+                width: 100%;
+                text-align: right;
+                color: silver;
+                margin-bottom: -7px;
+                margin-top: auto;
+            }
+
+        .text-l {
+            float: left;
+            padding-right: 10px;
+        }
+
+        .text-r {
+            float: right;
+            padding-left: 10px;
+        }
+
+        .avatar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 25%;
+            float: left;
+            padding-right: 10px;
+        }
+
+        .macro {
+            margin-top: 5px;
+            width: 80%;
+            border-radius: 5px;
+            padding: 5px;
+            display: flex;
+        }
+
+        .msj-rta {
+            float: right;
+            background: whitesmoke;
+        }
+
+        .msj {
+            float: left;
+            background: white;
+        }
+
+        .frame {
+            background: #e0e0de;
+            height: 530px;
+            /*overflow: hidden;*/
+            padding: 0;
+        }
+
+            .frame > div:last-of-type {
+                position: absolute;
+                bottom: 5px;
+                width: 100%;
+                display: flex;
+            }
+
+        ul {
+            width: 100%;
+            list-style-type: none;
+            padding: 18px;
+            position: absolute;
+            bottom: 32px;
+            display: flex;
+            flex-direction: column;
+            height: 480px;
+            float: left;
+            overflow-y: auto;
+        }
+
+        .msj:before {
+            width: 0;
+            height: 0;
+            content: "";
+            top: -5px;
+            left: -14px;
+            position: relative;
+            border-style: solid;
+            border-width: 0 13px 13px 0;
+            border-color: transparent #ffffff transparent transparent;
+        }
+
+        .msj-rta:after {
+            width: 0;
+            height: 0;
+            content: "";
+            top: -5px;
+            left: 14px;
+            position: relative;
+            border-style: solid;
+            border-width: 13px 13px 0 0;
+            border-color: whitesmoke transparent transparent transparent;
+        }
+
+        input:focus {
+            outline: none;
+        }
+
+        ::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+            color: #d4d4d4;
+        }
+
+        ::-moz-placeholder { /* Firefox 19+ */
+            color: #d4d4d4;
+        }
+
+        :-ms-input-placeholder { /* IE 10+ */
+            color: #d4d4d4;
+        }
+
+        :-moz-placeholder { /* Firefox 18- */
+            color: #d4d4d4;
         }
     </style>
 }
@@ -18,6 +157,10 @@
     <script src="~/Scripts/jquery.signalR-2.2.2.min.js"></script>
     <script src="~/signalr/hubs"></script>
     <script>
+        var me = {};
+        me.avatar = "https://lh6.googleusercontent.com/-lr2nyjhhjXw/AAAAAAAAAAI/AAAAAAAARmE/MdtfUmC0M4s/photo.jpg?sz=48";
+        var you = {};
+        you.avatar = "https://a11.t26.net/taringa/avatares/9/1/2/F/7/8/Demon_King1/48x48_5C5.jpg";
         var clients = [];
         var chat;
         var username="@ViewBag.user.name";
@@ -31,24 +174,55 @@
                 alert(message);
             }
             //注册显示信息的方法
-            chat.client.addMessage = function (message, connectionId,ismyself) {
-
+            chat.client.addMessage = function (message, from_name,from_conId,to_name,to_conId) {
                 debugger
-                if ($.inArray(connectionId, clients)==-1) {
-                    var findbtn_conID="button[connectionId="+connectionId+"]";
-                    var friendName= $(findbtn_conID).attr('friendName');
-                    showWin(connectionId,friendName);
-                }
-                if(ismyself)
+                if(username!=from_name&&username==to_name)
                 {
-                    $("#" + connectionId).find("ul").append('<li>'+username+":  "+message+'</li>')
+                    var fri_conId = '#'+from_conId;
+                    if(!($(fri_conId).attr('name')==from_name))
+                    {
+                        showWin(from_conId,from_name);  
+                    }
+                    var control = "";
+                    var date = formatAMPM(new Date());
+                    control = '<li style="width:95%">' +
+                                    '<div class="msj macro">' +
+                                    '<div class="avatar"><img class="img-circle" style="width:100%;" src="'+ you.avatar +'" /></div>' +
+                                        '<div class="text text-l">' +
+                                            '<p>'+ message +'</p>' +
+                                            '<p><small>'+date+'</small></p>' +
+                                        '</div>' +
+                                    '</div>' +
+                                '</li>';
+                    $("ul.chat_content").append(control);
                 }
-                else
+                if(username==from_name&&username==to_name)
                 {
-                    var findbtn_conID="button[connectionId="+connectionId+"]";
-                    var friendName= $(findbtn_conID).attr('friendName');
-                    $("#" + connectionId).find("ul").append('<li>'+friendName+"  "+message+'</li>')
+                    control = '<li style="width:95%;">' +
+                    '<div class="msj-rta macro">' +
+                        '<div class="text text-r">' +
+                            '<p>'+message+'</p>' +
+                            '<p><small>'+date+'</small></p>' +
+                        '</div>' +
+                    '<div class="avatar" style="padding:0px 0px 0px 10px !important"><img class="img-circle" style="width:100%;" src="'+me.avatar+'" /></div>' +                                
+              '</li>';
+                    $("ul.chat_content").append(control);
                 }
+                //if ($.inArray(connectionId, clients)==-1) {
+                //    var findbtn_conID="button[connectionId="+connectionId+"]";
+                //    var friendName= $(findbtn_conID).attr('friendName');
+                //    showWin(connectionId,friendName);
+                //}
+                //if(ismyself)
+                //{
+                //    $("#" + connectionId).find("ul").append('<li>'+username+":  "+message+'</li>')
+                //}
+                //else
+                //{
+                //    var findbtn_conID="button[connectionId="+connectionId+"]";
+                //    var friendName= $(findbtn_conID).attr('friendName');
+                //    $("#" + connectionId).find("ul").append('<li>'+friendName+"  "+message+'</li>')
+                //}
             }
             //注册显示所有用户的方法
             chat.client.getUsers = function (data) {
@@ -68,8 +242,10 @@
                     {
                         //console.log(data[i])
                         if(data[i].name==username)continue;//如果是自己就跳過這輪迴圈
-                        var user= $("<a></a>").attr({"class":"list-group-item alert alert-success","id":data[i].id,"connectionId":data[i].ConnectionId}).text(data[i].name);
-                        user.append('<input type="button" value="私聊" class="btn btn-primary btn-sm pull-right chat_btn" />')
+                        var user= $("<a></a>").attr({"class":"list-group-item alert alert-success","id":data[i].id}).text(data[i].name);
+                        var btn=$('<input type="button" value="私聊" class="btn btn-primary btn-sm pull-right chat_btn" onclick="userChat(this)" />').attr({'id':data[i].id,'name':data[i].ConnectionId})
+                        //user.append('<input type="button" value="私聊" class="btn btn-primary btn-sm pull-right chat_btn" onclick="userChat(this)" />')
+                        user.append(btn);
                         if(data[i].IsOnline==true)
                         {
                             user.append('<img src="../../Media/green_dot_2.png" class="pull-right vcenter"/>')
@@ -96,21 +272,42 @@
                 $('#connId').text(connId);
                 chat.server.getName(username);
             });
+
+
+            $('#chatWin').on("keyup","input.mytext",function(e){
+                if (e.which == 13){
+                    var text = $(this).val();
+                    if (text !== ""){
+                        //insertChat("me", text);              
+                        $(this).val('');
+                        var targetConnectionId =$(this).attr('id');
+                        //    var targetConnectionId = $(userObj).attr("connectionId");
+                        chat.server.sendMessage(targetConnectionId, text);
+                    }
+                }
+            });
+
         });
 
         //开始聊天
-        function userChat(obj)
+        function userChat(btn)
         {
-            var connectionId = $(obj).attr('connectionId');
-            var friendName = $(obj).attr('friendName');
+            //var connectionId = $(obj).parent.attr('connectionId');
+            //var friendName = $(obj).parent.attr('friendName');
+            var connectionId=$(btn).attr('name');
+              var friendName=$(btn).parent().text();
             showWin(connectionId,friendName);
         }
         function  showWin(connectionId,friendName)
         {
             //var connectionId = $(obj).attr('connectionId');
-            clients.push(connectionId);
-            var html = '<div style="float:left;margin-left:30px;border:double" id="' + connectionId + '" connectionId="' + connectionId + '">' + friendName + '私聊:<button onclick="exitChat(this)">離開</button><ul id=chat_area></ul><input type="text" /> <button onclick="sendMessage(this)">送出</button></div>';
-            $("#userBox").append(html);
+            //clients.push(connectionId);
+            //var html = '<div style="float:left;margin-left:30px;border:double" id="' + connectionId + '" connectionId="' + connectionId + '">' + friendName + '私聊:<button onclick="exitChat(this)">離開</button><ul id=chat_area></ul><input type="text" /> <button onclick="sendMessage(this)">送出</button></div>';
+            //$("#userBox").append(html);
+
+            
+            var chatwin_html= '<div class="frame"><ul class="chat_content"></ul><div><div class="msj-rta macro" style="margin:auto"><div class="text text-r" style="background:whitesmoke !important;"><input id="'+connectionId+'" name="'+friendName+'" class="mytext" placeholder="Type a message" /></div></div></div></div>'  
+            $('#chatWin').append(chatwin_html);
         }
 
         function exitChat(btnObj)
@@ -121,17 +318,17 @@
             //chat.server.exitChat(connectionId);
         }
         //发送消息
-        function sendMessage(data)
-        {
-            var message = $(data).prev().val();
-            var  userObj = $(data).parent();
-            //var username = $("#userName").html();
-            //message = username + ":" + message;
-            console.info($(userObj).attr("connectionId"));
-            var targetConnectionId = $(userObj).attr("connectionId");
-            chat.server.sendMessage(targetConnectionId, message);
-            $(data).prev().val("");
-        }
+        //function sendMessage(data)
+        //{
+        //    var message = $(data).prev().val();
+        //    var  userObj = $(data).parent();
+        //    //var username = $("#userName").html();
+        //    //message = username + ":" + message;
+        //    //console.info($(userObj).attr("connectionId"));
+        //    var targetConnectionId = $(userObj).attr("connectionId");
+        //    chat.server.sendMessage(targetConnectionId, message);
+        //    $(data).prev().val("");
+        //}
 
         // This optional function html-encodes messages for display in the page.
         function htmlEncode(value) {
@@ -139,15 +336,61 @@
             return encodedValue;
         }
 
-        //按下私聊開始聊天
-        $('.chat_btn').click(function(){
-            //var connectionId = $(obj).attr('connectionId');
-            //var friendName = $(obj).attr('friendName');
-            //showWin(connectionId,friendName);
-            var connectionId=$(this).parent.attr('connectionId').val();
-            var friendName=$(this).parent.text();
-            showWin(connectionId,friendName);
-        })
+
+        ////按下私聊開始聊天
+        //$("input.chat_btn").on('click',function(btn){
+        //    //var connectionId = $(obj).attr('connectionId');
+        //    //var friendName = $(obj).attr('friendName');
+        //    //showWin(connectionId,friendName);
+        //    var connectionId=$(btn).parent.attr('connectionId').val();
+        //    var friendName=$(btn).parent.text();
+        //    showWin(connectionId,friendName);
+        //})
+
+        function formatAMPM(date) {
+            var hours = date.getHours();
+            var minutes = date.getMinutes();
+            var ampm;
+            if (hours == 12) { ampm = 'PM'; };
+            if (hours == 24) { ampm = 'AM'; hours = 0 };
+            if (hours != 12 && hours != 24)
+            {
+                ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+            }
+            //var ampm = hours >= 12 ? 'PM' : 'AM';
+            //hours = hours % 12;
+            //hours = hours ? hours : 12; // the hour '0' should be '12'
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            var strTime = hours + ':' + minutes + ' ' + ampm;
+            return strTime;
+        }   
+        function insertChat(who, text){
+            var control = "";
+            var date = formatAMPM(new Date());
+            if (who != "me"){
+                control = '<li style="width:95%">' +
+                                '<div class="msj macro">' +
+                                '<div class="avatar"><img class="img-circle" style="width:100%;" src="'+ you.avatar +'" /></div>' +
+                                    '<div class="text text-l">' +
+                                        '<p>'+ text +'</p>' +
+                                        '<p><small>'+date+'</small></p>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</li>';
+                $("ul.chat_content").append(control);
+            }else{
+                control = '<li style="width:95%;">' +
+                                '<div class="msj-rta macro">' +
+                                    '<div class="text text-r">' +
+                                        '<p>'+text+'</p>' +
+                                        '<p><small>'+date+'</small></p>' +
+                                    '</div>' +
+                                '<div class="avatar" style="padding:0px 0px 0px 10px !important"><img class="img-circle" style="width:100%;" src="'+me.avatar+'" /></div>' +                                
+                          '</li>';
+                $("ul.chat_content").append(control);
+            }
+        }
     </script>
 
 }
@@ -191,20 +434,25 @@
         </table>
         <h3>在線朋友列表</h3>
         <div class="list-group col-lg-6" id="userList">
-            @foreach (var user in Model)
+            @*@foreach (var user in Model)
             {
                 if (user.id != ViewBag.user.id)
                 {
                     <a class="list-group-item alert alert-success" id="@user.id" name="@user.name">
                         @user.name
-                        <input type="button" value="私聊" class="btn btn-primary btn-sm" />
+                        <input type="button" value="私聊" class="btn btn-primary btn-sm chat_btn" />
                         @if (user.IsOnline != null && user.IsOnline == true)
                         {
                             <img src="~/Media/green_dot_2.png" class="pull-right vcenter " />
                         }
                     </a>
                 }
-            }
+            }*@
+        </div>
+        <div class="col-lg-6">
+            <div class="col-lg-offset-2 col-lg-8" id="chatWin">
+
+            </div>
         </div>
     </div>
 </div>

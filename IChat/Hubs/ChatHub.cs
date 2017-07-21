@@ -43,16 +43,18 @@ namespace IChat.Hubs
         public void SendMessage(string connectionId, string message)
         {
             Clients.All.hello();
-            var user = users.Where(s => s.ConnectionID == connectionId).FirstOrDefault();
-            if (user != null)
+            //var user = users.Where(s => s.ConnectionID == connectionId).FirstOrDefault();
+            var friend = dc.user_master.Where(u => u.ConnectionId == connectionId).FirstOrDefault();
+            var myself = dc.user_master.Where(u=>u.ConnectionId == Context.ConnectionId).FirstOrDefault();
+            if (friend != null)
             {
-                Clients.Client(connectionId).addMessage(message, Context.ConnectionId, false);
+                Clients.Client(connectionId).addMessage(message, myself.name,Context.ConnectionId, friend.name, connectionId);
                 //给自己发送，把用户的ID传给自己  
-                Clients.Client(Context.ConnectionId).addMessage(message, connectionId, true);
+                Clients.Client(Context.ConnectionId).addMessage(message, myself.name,"", myself.name, "");
             }
             else
             {
-                Clients.Client(Context.ConnectionId).showMessage("该用户已离线");
+                Clients.Client(Context.ConnectionId).showMessage("該用戶已離線!");
             }
         }
 
